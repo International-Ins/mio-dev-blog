@@ -1,2 +1,2 @@
-#= require vendor/jquery-2.2.4
+#= require vendor/jquery-3.1.1.slim
 #= require_tree ./vendor/

@@ -20,6 +20,8 @@ github_username:  jekyll
 # Build settings
 markdown: kramdown
 
+destination: docs
+
 # Plugins, yay!
 gems:
   # Creates an XML sitemap.

@@ -1,4 +1,4 @@
 ## Main application.
 alias start="docker-compose build && docker-compose up"
 alias stop="docker-compose down --rmi local"
-alias build="docker-compose run --rm -e JEKYLL_ENV=production web jekyll build"
+alias build="rm -Rf docs && docker-compose run --rm -e JEKYLL_ENV=production web jekyll build"

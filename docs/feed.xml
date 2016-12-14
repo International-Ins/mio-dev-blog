@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MIO - Dev Blog</title>
+    <description>Development blog for MexicoInsuranceOnline.com written by developers for agents selling Mexico insurance.
+</description>
+    <link>http://dev-blog.mexicoinsuranceonline.com/</link>
+    <atom:link href="http://dev-blog.mexicoinsuranceonline.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Wed, 14 Dec 2016 18:02:18 +0000</pubDate>
+    <lastBuildDate>Wed, 14 Dec 2016 18:02:18 +0000</lastBuildDate>
+    <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>Developer Tools - Jack</title>
+        <description>&lt;p&gt;We developers &lt;strong&gt;love&lt;/strong&gt; our tools; here are Jack’s favorites.
+&lt;!-- /excerpt --&gt;
+Tools can make all the difference in the world to a developer.  Everything from
+the keyboard you physically type on, to the browser you test code in.  It all
+lends a hand in making developers as efficient as possible.&lt;/p&gt;
+
+&lt;h2 id=&quot;physical-interface&quot;&gt;Physical Interface&lt;/h2&gt;
+
+&lt;p&gt;Let’s get it out of the way… I develop on a 15” MacBook Pro.  Why, you may
+ask?  I find that it is much more efficient to develop on a machine as close
+to the server as possible and MacOS is a close cousin to the Linux based
+servers where MIO runs.  MacOS also alleviates the hassle of configuring
+monitors, networks, keyboards, mice, etc, that you may find in a Linux
+environment.&lt;/p&gt;
+
+&lt;p&gt;I also use gaming accessories for things like a
+&lt;a href=&quot;http://www.razerzone.com/&quot;&gt;Razer&lt;/a&gt; Blackwidow Ultimate keyboard, and an old
+Razer Naga mouse I had lying around.  I find they are very comfortable to me, 
+and a joy to use.&lt;/p&gt;
+
+&lt;h2 id=&quot;editor&quot;&gt;Editor&lt;/h2&gt;
+
+&lt;p&gt;In the last year I’ve switched from &lt;a href=&quot;http://www.vim.org/&quot;&gt;vim&lt;/a&gt; to Github’s
+&lt;a href=&quot;https://atom.io/&quot;&gt;Atom&lt;/a&gt; editor.  Atom provides the same great keyboard-only
+experience as vim, but with community plugins and some additional features.&lt;/p&gt;
+
+&lt;h2 id=&quot;terminal&quot;&gt;Terminal&lt;/h2&gt;
+
+&lt;p&gt;In order to start servers and really get around in a Unix-like OS (such as
+MacOS), a good terminal is required.  MacOS’s built in Terminal is fantastic,
+but I find &lt;a href=&quot;https://hyper.is/&quot;&gt;Hyper&lt;/a&gt;’s customization to be worth the switch.&lt;/p&gt;
+
+&lt;p&gt;I also run ZSH for my shell, and
+&lt;a href=&quot;https://github.com/robbyrussell/oh-my-zsh&quot;&gt;Oh-My-ZSH&lt;/a&gt; to add tools to the
+command line.&lt;/p&gt;
+
+&lt;h2 id=&quot;virtualization&quot;&gt;Virtualization&lt;/h2&gt;
+
+&lt;p&gt;MIO uses a lot of tools in many different languages. In order to keep these all
+neat and tidy, we make extensive use of &lt;a href=&quot;https://www.docker.com/&quot;&gt;Docker&lt;/a&gt;. 
+Docker allows me to have different development environments running on the
+same machine without clomping all over each other.  As an example, this blog
+is written using a version of Ruby that would conflict with the version we use
+to develop custom UI’s for some agents.  Before Docker, it could take hours of
+work to switch between those two projects.  With Docker I can ignore that
+dependancy and just start working.&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 14 Dec 2016 00:00:00 +0000</pubDate>
+        <link>http://dev-blog.mexicoinsuranceonline.com/2016/12/14/developer-tools.html</link>
+        <guid isPermaLink="true">http://dev-blog.mexicoinsuranceonline.com/2016/12/14/developer-tools.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Change Control Process Tools</title>
+        <description>&lt;p&gt;MIO’s Change control process keeps everyone on track and on time.
+&lt;!-- /excerpt --&gt;
+Our Change Control Process (CCP) was developed to bridge the gap between our
+business (insurance) interests and our development (IT) interests.&lt;/p&gt;
+
+&lt;p&gt;Our process is broken up into XXX distinct phases:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Feature Requests - Agents or Underwriters request a new feature or a
+change to an existing feature.&lt;/li&gt;
+  &lt;li&gt;Documentation - Our Project Manager gathers requirements from the agent or
+underwriter in order to create documentation and wireframes of the feature.&lt;/li&gt;
+  &lt;li&gt;Approval - All documentation requires approval by MIO’s management team.
+This is to ensure that the request has been fully captured into the
+documentation.  A priority and timeline are also set.&lt;/li&gt;
+  &lt;li&gt;Implementation - A developer, designer, or systems administrator, take the
+documentation and begin implenting the change.&lt;/li&gt;
+  &lt;li&gt;Testing - A tester, using a staging environment, rigerously tests all
+aspects of the system that may be affected by the change at hand.&lt;/li&gt;
+  &lt;li&gt;Acceptance - MIO’s management team and the agent or underwriter who
+requested the change are given a change to ensure that the&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;fogbugz&quot;&gt;FogBugz&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.fogcreek.com/fogbugz/&quot;&gt;FogBugz&lt;/a&gt; is the cornerstone of our
+development process.  In FogBugz, we use their Wiki functionality for creating
+and keeping track of our documentation (but not wireframing), their ticketing
+system for tracking individual change requests, their planner for managing
+sprints and estimates, and their
+&lt;a href=&quot;https://www.fogcreek.com/fogbugz/devhub&quot;&gt;Dev Hub&lt;/a&gt; for managing our source code.&lt;/p&gt;
+
+&lt;h2 id=&quot;lucid-chart&quot;&gt;Lucid Chart&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.lucidchart.com/&quot;&gt;Lucid Chart&lt;/a&gt; is a tool we use for Wireframing and
+flow charts.  Everything in Lucid Chart is stored in Google Drive, and
+accessible via a web link, so the wireframes and charts are easily shared.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 14 Dec 2016 00:00:00 +0000</pubDate>
+        <link>http://dev-blog.mexicoinsuranceonline.com/2016/12/14/change-control-tools.html</link>
+        <guid isPermaLink="true">http://dev-blog.mexicoinsuranceonline.com/2016/12/14/change-control-tools.html</guid>
+        
+        
+      </item>
+    
+  </channel>
+</rss>

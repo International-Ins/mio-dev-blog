@@ -6,3 +6,45 @@
 //= require_self
 
 // Put styles here!
+
+$grey: #999;
+$blue: #06c;
+
+html, body {
+  height: 100vh;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  img {
+    border: none;
+  }
+}
+
+a {
+  color: $blue;
+}
+
+.right-nav {
+  height: 100%;
+  border-left: 1px solid $grey;
+  padding-left: 10px;
+  h3 {
+    font-size: 2em;
+  }
+}
+
+ul.posts_list {
+  list-style: none;
+  height: 100%;
+  li {
+    margin-bottom: 20px;
+    border-bottom: 1px dashed $grey;
+    .excerpt {
+      font-size: .9em;
+      font-style: italic;
+    }
+  }
+}

@@ -6,9 +6,73 @@
 </description>
     <link>http://dev-blog.mexicoinsuranceonline.com/</link>
     <atom:link href="http://dev-blog.mexicoinsuranceonline.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 22 Feb 2017 03:18:11 +0000</pubDate>
-    <lastBuildDate>Wed, 22 Feb 2017 03:18:11 +0000</lastBuildDate>
+    <pubDate>Wed, 01 Mar 2017 23:39:07 +0000</pubDate>
+    <lastBuildDate>Wed, 01 Mar 2017 23:39:07 +0000</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>Dumb Templates, Smart Design</title>
+        <description>&lt;p&gt;What good is having code running inside your templates, anyway?&lt;/p&gt;
+
+&lt;!-- /excerpt --&gt;
+
+&lt;p&gt;The &lt;a href=&quot;https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller&quot;&gt;MVC pattern&lt;/a&gt; is a wonderful thing.  It helps developers design resilient, testable, and well structured applications.  Almost every web framework is centered around MVC (&lt;a href=&quot;http://www.phoenixframework.org/&quot;&gt;Phoenix&lt;/a&gt;, withstanding).  So why, then, do most of these frameworks allow you to embed code directly into the view layer?&lt;/p&gt;
+
+&lt;p&gt;View layers tend to allow code because developers immediately run into problems when they need to iterate over a list of items.  And, let’s face it, with a CRUD operation, that’s one of the first things you do.  One can justify leaving code in the view layer, because it adds flexibility.  The last thing you want is to have your view templates be a limiting factor in your application.&lt;/p&gt;
+
+&lt;p&gt;Mexico Insurance Online’s application, however, is a solid exception to that rule.  We have some… &lt;em&gt;substantial&lt;/em&gt; resellers who sell directly to their customers through the application.  Those resellers demand an entirely custom view.  From the font on a &amp;lt;label&amp;gt; tag to which fields appear on a given form, everything can, and will, be customized.  To that end, a bit of rigidity actually makes life easier, let me show you.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/zendesk/curly&quot;&gt;Curly Templates&lt;/a&gt; is what Mexico Insurance Online’s application will use for the view layer in our rebuild project.  The magic of Curly lies in its Presenter classes:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Posts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CommentPresenter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Curly&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Presenter&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;presents&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:comment&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;replies&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;content_tag&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:div&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reply&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@comment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;replies&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;render&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;reply&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reply&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;A single presenter, such as the above, can be shared across multiple views.  If a resellers needs to customize the way that replies are presented, then an alternative to the &lt;code class=&quot;highlighter-rouge&quot;&gt;_reply.html.curly&lt;/code&gt; file can be created, leaving the rest of the view un-touched.&lt;/p&gt;
+
+&lt;p&gt;Had this view been implemented with the ERB syntax that comes with Ruby on Rails, then both the main application and the custom view for the reseller would need the loop code.  Given that Mexico Insurance Online has 296 white-label templates at the moment, this means there would be 296 loops to update if something changed.&lt;/p&gt;
+
+&lt;p&gt;This may seem like something simple, but the white-labeling provided by Mexico Insurance Online is crucial to its continued success.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 01 Mar 2017 00:00:00 +0000</pubDate>
+        <link>http://dev-blog.mexicoinsuranceonline.com/2017/03/01/dumb-templates.html</link>
+        <guid isPermaLink="true">http://dev-blog.mexicoinsuranceonline.com/2017/03/01/dumb-templates.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Rebuild vs. Refactor</title>
+        <description>&lt;p&gt;Rebuilding vs Refactoring is an argument as old as software itself, and
+Mexico Insurance Online is no except.&lt;/p&gt;
+
+&lt;!-- /excerpt --&gt;
+
+&lt;p&gt;Rebuilding means starting from scratch with an entirely new application, and building from the foundation up.  Refactoring is the opposite, taking your existing application and “fixing” it.&lt;/p&gt;
+
+&lt;p&gt;Many websites and consultants will try to get you to shy away from rebuilding because it is expensive in both time and money.  You’ll probably hear phrases like, “there is no bad code”, or “never throw away code”.  No matter how badly you bang up a car, you can always fix it; but will it ever be the same?  It all comes back to “don’t reinvent the wheel”.  In this case, you have a wheel, don’t build a new one.&lt;/p&gt;
+
+&lt;p&gt;Alternatively, &lt;a href=&quot;https://en.wikipedia.org/wiki/Code_refactoring&quot;&gt;refactoring&lt;/a&gt; your application allows you to keep your existing code, but Make It Better™.  Refactoring yields many of the same benefits as a rebuild, but you may be able to see the benefits right away.  The downside to refactoring is the code you encounter in a non-software business.  If you’re lucky, your business has grown since you first built your application.  New features were added at a feverish pace with no regard for the quality of code, after all the due date was a firm “Yesterday”.  And why should you be worried about your application, you don’t sell software, you sell Widgets!  This means that there are some deep, dark, hacks going on in that application.  And since you’re refactoring, you probably won’t be rid of them for as long time.&lt;/p&gt;
+
+&lt;p&gt;So what did Mexico Insurance Online decide?  Other factors in the business, such as wanting to expand our IT department and wanting more robust (business-friendly) documentation, swayed the decision firmly into Rebuild territory.  Our current system runs on a language that is losing support quickly, and a framework that was born of an age when PHP was the “New Hotness”.  As a result, we’ve decided to rebuild in a more modern language and framework.&lt;/p&gt;
+
+&lt;p&gt;This isn’t to say that refactoring wouldn’t be good for your business, but it just wasn’t the right fit for us.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 07 Feb 2017 00:00:00 +0000</pubDate>
+        <link>http://dev-blog.mexicoinsuranceonline.com/2017/02/07/rebuild-vs-refactor.html</link>
+        <guid isPermaLink="true">http://dev-blog.mexicoinsuranceonline.com/2017/02/07/rebuild-vs-refactor.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Developer Tools - Jack</title>

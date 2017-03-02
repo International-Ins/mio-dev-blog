@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Dumb Templates, Smart Design - MIO - Dev Blog</title>
+  <meta name="description" content="What good is having code running inside your templates, anyway?">
+  <!-- Skelton's favorite font. -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-35b766997b4b3e680edfd0016dfb1730cd9c1f7669513c83ea2091fcbf9639c4.css">
+  <link rel="canonical" href="http://dev-blog.mexicoinsuranceonline.com/2017/03/01/dumb-templates.html">
+  <link rel="alternate" type="application/rss+xml" title="MIO - Dev Blog" href="http://dev-blog.mexicoinsuranceonline.com/feed.xml">
+
+</head>
+
+  <body>
+    <header class="container">
+  <a href="http://dev-blog.mexicoinsuranceonline.com" alt="Home">
+    <img src="/assets/mio-logo-85b8429778764ab0d95dbdc40ab9e8092e616b0576ea5b68be23c4d0c9c18ddb.png" alt="Mexico Insurance Online">
+  </a>
+</header>
+<div class="container">
+  <div class="row">
+    <div class="twelve columns">
+      <a href="https://www.mexicoinsuranceonline.com/" title="Mexico Insurance Online Homepage">
+        Mexico Insurance Online - Home
+      </a>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <h1>Dumb Templates, Smart Design</h1>
+<div class="post">
+  <p>What good is having code running inside your templates, anyway?</p>
+
+<!-- /excerpt -->
+
+<p>The <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">MVC pattern</a> is a wonderful thing.  It helps developers design resilient, testable, and well structured applications.  Almost every web framework is centered around MVC (<a href="http://www.phoenixframework.org/">Phoenix</a>, withstanding).  So why, then, do most of these frameworks allow you to embed code directly into the view layer?</p>
+
+<p>View layers tend to allow code because developers immediately run into problems when they need to iterate over a list of items.  And, let’s face it, with a CRUD operation, that’s one of the first things you do.  One can justify leaving code in the view layer, because it adds flexibility.  The last thing you want is to have your view templates be a limiting factor in your application.</p>
+
+<p>Mexico Insurance Online’s application, however, is a solid exception to that rule.  We have some… <em>substantial</em> resellers who sell directly to their customers through the application.  Those resellers demand an entirely custom view.  From the font on a &lt;label&gt; tag to which fields appear on a given form, everything can, and will, be customized.  To that end, a bit of rigidity actually makes life easier, let me show you.</p>
+
+<p><a href="https://github.com/zendesk/curly">Curly Templates</a> is what Mexico Insurance Online’s application will use for the view layer in our rebuild project.  The magic of Curly lies in its Presenter classes:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Posts</span><span class="o">::</span><span class="no">CommentPresenter</span> <span class="o">&lt;</span> <span class="no">Curly</span><span class="o">::</span><span class="no">Presenter</span>
+  <span class="n">presents</span> <span class="ss">:comment</span>
+  <span class="k">def</span> <span class="nf">replies</span>
+    <span class="n">content_tag</span> <span class="ss">:div</span> <span class="k">do</span>
+      <span class="k">for</span> <span class="n">reply</span> <span class="k">in</span> <span class="vi">@comment</span><span class="p">.</span><span class="nf">replies</span> <span class="k">do</span>
+        <span class="n">render</span> <span class="s1">'reply'</span><span class="p">,</span> <span class="n">reply</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>A single presenter, such as the above, can be shared across multiple views.  If a resellers needs to customize the way that replies are presented, then an alternative to the <code class="highlighter-rouge">_reply.html.curly</code> file can be created, leaving the rest of the view un-touched.</p>
+
+<p>Had this view been implemented with the ERB syntax that comes with Ruby on Rails, then both the main application and the custom view for the reseller would need the loop code.  Given that Mexico Insurance Online has 296 white-label templates at the moment, this means there would be 296 loops to update if something changed.</p>
+
+<p>This may seem like something simple, but the white-labeling provided by Mexico Insurance Online is crucial to its continued success.</p>
+
+</div>
+    </div>
+    <footer class="container">
+</footer>
+
+    <script type="text/javascript" src="/assets/main-687b62a56230369633341cad93dec92ce8331c9035a12e7ceeb7ec5d6397956f.js"></script>
+  </body>
+</html>

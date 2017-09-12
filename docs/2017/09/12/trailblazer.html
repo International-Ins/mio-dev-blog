@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Trailblazer, beyond MVC - MIO - Dev Blog</title>
+  <meta name="description" content="Trailblazer helps to go beyond MVC, helping us segregate operations into their own space.">
+  <!-- Skelton's favorite font. -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-e6301461d73f72aa6cafa20fc722c4efcd3fe71ee1b4e49d0d89d812bbdff00b.css">
+  <link rel="canonical" href="http://dev-blog.mexicoinsuranceonline.com/2017/09/12/trailblazer.html">
+  <link rel="alternate" type="application/rss+xml" title="MIO - Dev Blog" href="http://dev-blog.mexicoinsuranceonline.com/feed.xml">
+
+</head>
+
+  <body>
+    <header class="container">
+  <a href="http://dev-blog.mexicoinsuranceonline.com" alt="Home">
+    <img src="/assets/mio-logo-85b8429778764ab0d95dbdc40ab9e8092e616b0576ea5b68be23c4d0c9c18ddb.png" alt="Mexico Insurance Online">
+  </a>
+</header>
+
+    <div class="container">
+      <h1>Trailblazer, beyond MVC</h1>
+<div class="post">
+  <p>Trailblazer helps to go beyond MVC, helping us segregate operations into their own space.</p>
+
+<!-- /excerpt -->
+
+<p>Previously, we discussed how <a href="/2017/03/01/dumb-templates.html">dumb templates</a> help Mexico Insurance Online provide resellers with hyper-customized versions of our application. Now, we’ll discuss a way of compartmentalizing code, which extends this flexibility by compartmentalizing operations with <a href="http://trailblazer.to/">Trailblazer</a>.</p>
+
+<p>The basic constructs in Rails are Models, Views, and Controllers (MVC).  Each of these has a specific purpose which they excel at.  Models are great at storing data in a database.  Controllers are great at routing web requests to ruby code.  Views are great at presenting the data and overall User eXperience (UX).  These constructs from Rails are the basics constructs of any simple CRUD (Create, Read, Update, Delete, the four basic actions taken on data) application.</p>
+
+<p>In business applications, however, we have more complex logic that may not fit into the MVC “buckets”.  As an example, consider the following, to charge a credit card (completely made up):</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">charge_card</span><span class="p">(</span><span class="n">cc_info</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span>
+  <span class="n">transaction</span> <span class="o">=</span> <span class="no">Braintree</span><span class="p">.</span><span class="nf">new_transaction</span><span class="p">(</span><span class="ss">cc_num: </span><span class="n">cc_info</span><span class="p">.</span><span class="nf">account_number</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">authorize</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+    <span class="n">transaction</span><span class="p">.</span><span class="nf">charge</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="k">raise</span> <span class="s2">"Unable to charge credit card."</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>The credit card info will never be saved to the database, used directly inside a view, and is not a part of a web request, so doesn’t belong in MVC.  This is where Trailblazer steps in and offers a new abstraction called an Operation.  Each operation encompasses a specific workflow.  As an example, the above code could be written as an operation:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Payment</span><span class="o">::</span><span class="no">Charge</span><span class="o">::</span><span class="no">CreditCard</span> <span class="o">&lt;</span> <span class="no">Trailblazer</span><span class="o">::</span><span class="no">Operation</span>
+  <span class="n">step</span> <span class="ss">:model!</span>
+  <span class="n">step</span> <span class="ss">:authorize!</span>
+  <span class="n">failure</span> <span class="ss">:error!</span>
+  <span class="n">step</span> <span class="ss">:charge!</span>
+  <span class="n">failure</span> <span class="ss">:error!</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">model!</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">params</span><span class="p">:,</span> <span class="o">**</span><span class="p">)</span>
+    <span class="n">options</span><span class="p">[</span><span class="s1">'model'</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">'gateway'</span><span class="p">].</span><span class="nf">new_transaction</span><span class="p">(</span>
+      <span class="ss">cc_num: </span><span class="n">params</span><span class="p">[</span><span class="s1">'cc_info'</span><span class="p">].</span><span class="nf">account_number</span>
+    <span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">authorize!</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">params</span><span class="p">:,</span> <span class="o">**</span><span class="p">)</span>
+    <span class="n">options</span><span class="p">[</span><span class="s1">'model'</span><span class="p">].</span><span class="nf">authorize</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">'amount'</span><span class="p">])</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">charge!</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">params</span><span class="p">:,</span> <span class="o">**</span><span class="p">)</span>
+    <span class="n">options</span><span class="p">[</span><span class="s1">'model'</span><span class="p">].</span><span class="nf">charge</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">'amount'</span><span class="p">])</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">error!</span>
+    <span class="k">raise</span> <span class="s2">"Unable to charge credit card."</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Even writing this out now, I find myself thinking, “That’s a lot more code to do the same thing”, but let’s break the operation down.  The calls to <code class="highlighter-rouge">step</code> and <code class="highlighter-rouge">failure</code> outline the process.  Simple and readable definition of the steps required to charge a credit card.  Each step is a method, and by appending <code class="highlighter-rouge">!</code>, we tell Trailblazer that the return value of the method is important.  A ‘falsey’ return will cause the Operation to trigger the next <code class="highlighter-rouge">failure</code> step, stopping the operation.  Also notice that steps are reusable, in the case of <code class="highlighter-rouge">error!</code></p>
+
+<p>The operation can be easily called from anywhere in the application with <code class="highlighter-rouge">Payment::Charge::CreditCard.call()</code>.  This means that if you are creating both a web interface, and an API, the same Operation can be called, and be safe in assuming it will work the same either way.  In fact, Trailblazer doesn’t even require Rails, so this same Operation could be used in Rails, Sinatra, or even in a command line tool.</p>
+
+<p>As icing on the cake, this Operation is also much easier to test compared to the same code in a Controller.  Because the Operation does not rely on Rails (or even ActiveRecord), it can be tested in isolation of the rest of the system, making for faster tests, and easier isolation.</p>
+
+<p>Trailblazer is not a silver bullet for development, but it does add useful abstractions to help keep code DRY, and help maintain the Single Responsibility Principle.</p>
+
+</div>
+    </div>
+    <footer class="container">
+  <div>
+    © 1999 - 2017
+    International Insurance Group, Inc. DBA Mexico &amp; RV Insurance Services
+  </div>
+  <div>
+    Visit
+    <a href="https://www.mexicoinsuranceonline.com/" rel="noopener" target="_blank">Mexico Insurance Online</a>
+    to sign up and sell our products on your website.
+  </div>
+</footer>
+
+    <script type="text/javascript" src="/assets/main-c4e13efdd11ca4a8394acb661ea84d99b3c9e7f86080caf1c1e75dd1cc38fc05.js"></script>
+  </body>
+</html>

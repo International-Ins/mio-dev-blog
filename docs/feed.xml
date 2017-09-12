@@ -6,9 +6,79 @@
 </description>
     <link>http://dev-blog.mexicoinsuranceonline.com/</link>
     <atom:link href="http://dev-blog.mexicoinsuranceonline.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 01 Mar 2017 23:39:07 +0000</pubDate>
-    <lastBuildDate>Wed, 01 Mar 2017 23:39:07 +0000</lastBuildDate>
-    <generator>Jekyll v3.1.6</generator>
+    <pubDate>Tue, 12 Sep 2017 21:16:28 +0000</pubDate>
+    <lastBuildDate>Tue, 12 Sep 2017 21:16:28 +0000</lastBuildDate>
+    <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>Trailblazer, beyond MVC</title>
+        <description>&lt;p&gt;Trailblazer helps to go beyond MVC, helping us segregate operations into their own space.&lt;/p&gt;
+
+&lt;!-- /excerpt --&gt;
+
+&lt;p&gt;Previously, we discussed how &lt;a href=&quot;/2017/03/01/dumb-templates.html&quot;&gt;dumb templates&lt;/a&gt; help Mexico Insurance Online provide resellers with hyper-customized versions of our application. Now, we’ll discuss a way of compartmentalizing code, which extends this flexibility by compartmentalizing operations with &lt;a href=&quot;http://trailblazer.to/&quot;&gt;Trailblazer&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The basic constructs in Rails are Models, Views, and Controllers (MVC).  Each of these has a specific purpose which they excel at.  Models are great at storing data in a database.  Controllers are great at routing web requests to ruby code.  Views are great at presenting the data and overall User eXperience (UX).  These constructs from Rails are the basics constructs of any simple CRUD (Create, Read, Update, Delete, the four basic actions taken on data) application.&lt;/p&gt;
+
+&lt;p&gt;In business applications, however, we have more complex logic that may not fit into the MVC “buckets”.  As an example, consider the following, to charge a credit card (completely made up):&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;charge_card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cc_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Braintree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new_transaction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;cc_num: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cc_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;account_number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;authorize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;charge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Unable to charge credit card.&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The credit card info will never be saved to the database, used directly inside a view, and is not a part of a web request, so doesn’t belong in MVC.  This is where Trailblazer steps in and offers a new abstraction called an Operation.  Each operation encompasses a specific workflow.  As an example, the above code could be written as an operation:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Payment&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Charge&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CreditCard&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Trailblazer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Operation&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;step&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:model!&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;step&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:authorize!&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;failure&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:error!&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;step&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:charge!&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;failure&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:error!&lt;/span&gt;
+
+  &lt;span class=&quot;kp&quot;&gt;private&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;model!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'model'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'gateway'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new_transaction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+      &lt;span class=&quot;ss&quot;&gt;cc_num: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'cc_info'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;account_number&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;authorize!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'model'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;authorize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'amount'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;charge!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'model'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;charge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'amount'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+  &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;error!&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Unable to charge credit card.&quot;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Even writing this out now, I find myself thinking, “That’s a lot more code to do the same thing”, but let’s break the operation down.  The calls to &lt;code class=&quot;highlighter-rouge&quot;&gt;step&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;failure&lt;/code&gt; outline the process.  Simple and readable definition of the steps required to charge a credit card.  Each step is a method, and by appending &lt;code class=&quot;highlighter-rouge&quot;&gt;!&lt;/code&gt;, we tell Trailblazer that the return value of the method is important.  A ‘falsey’ return will cause the Operation to trigger the next &lt;code class=&quot;highlighter-rouge&quot;&gt;failure&lt;/code&gt; step, stopping the operation.  Also notice that steps are reusable, in the case of &lt;code class=&quot;highlighter-rouge&quot;&gt;error!&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;The operation can be easily called from anywhere in the application with &lt;code class=&quot;highlighter-rouge&quot;&gt;Payment::Charge::CreditCard.call()&lt;/code&gt;.  This means that if you are creating both a web interface, and an API, the same Operation can be called, and be safe in assuming it will work the same either way.  In fact, Trailblazer doesn’t even require Rails, so this same Operation could be used in Rails, Sinatra, or even in a command line tool.&lt;/p&gt;
+
+&lt;p&gt;As icing on the cake, this Operation is also much easier to test compared to the same code in a Controller.  Because the Operation does not rely on Rails (or even ActiveRecord), it can be tested in isolation of the rest of the system, making for faster tests, and easier isolation.&lt;/p&gt;
+
+&lt;p&gt;Trailblazer is not a silver bullet for development, but it does add useful abstractions to help keep code DRY, and help maintain the Single Responsibility Principle.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 12 Sep 2017 00:00:00 +0000</pubDate>
+        <link>http://dev-blog.mexicoinsuranceonline.com/2017/09/12/trailblazer.html</link>
+        <guid isPermaLink="true">http://dev-blog.mexicoinsuranceonline.com/2017/09/12/trailblazer.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Dumb Templates, Smart Design</title>
@@ -29,7 +99,7 @@
   &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;replies&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;content_tag&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:div&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
       &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reply&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;vi&quot;&gt;@comment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;replies&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;render&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;reply&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reply&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;render&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'reply'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reply&lt;/span&gt;
       &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;

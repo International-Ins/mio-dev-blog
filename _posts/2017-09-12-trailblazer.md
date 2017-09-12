@@ -4,7 +4,7 @@ title: Trailblazer, beyond MVC
 excerpt_separator: <!-- /excerpt -->
 ---
 
-Trailblazer helps to go beyond MVC, helping us segregate operations into their own space.
+Trailblazer provides abstractions for code that doesn't belong in Models, Views, or Controllers.
 
 <!-- /excerpt -->
 

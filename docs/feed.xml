@@ -6,13 +6,13 @@
 </description>
     <link>http://dev-blog.mexicoinsuranceonline.com/</link>
     <atom:link href="http://dev-blog.mexicoinsuranceonline.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 12 Sep 2017 21:16:28 +0000</pubDate>
-    <lastBuildDate>Tue, 12 Sep 2017 21:16:28 +0000</lastBuildDate>
+    <pubDate>Tue, 12 Sep 2017 21:19:01 +0000</pubDate>
+    <lastBuildDate>Tue, 12 Sep 2017 21:19:01 +0000</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
         <title>Trailblazer, beyond MVC</title>
-        <description>&lt;p&gt;Trailblazer helps to go beyond MVC, helping us segregate operations into their own space.&lt;/p&gt;
+        <description>&lt;p&gt;Trailblazer provides abstractions for code that doesn’t belong in Models, Views, or Controllers.&lt;/p&gt;
 
 &lt;!-- /excerpt --&gt;
 

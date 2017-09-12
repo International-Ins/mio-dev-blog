@@ -40,8 +40,13 @@ ul.posts_list {
   list-style: none;
   height: 100%;
   li {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
     border-bottom: 1px dashed $grey;
+    .post_date {
+      display: block;
+      font-size: .6em;
+    }
     .excerpt {
       font-size: .9em;
       font-style: italic;

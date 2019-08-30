@@ -6,9 +6,56 @@
 </description>
     <link>http://dev-blog.mexicoinsuranceonline.com/</link>
     <atom:link href="http://dev-blog.mexicoinsuranceonline.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 12 Sep 2017 21:30:33 +0000</pubDate>
-    <lastBuildDate>Tue, 12 Sep 2017 21:30:33 +0000</lastBuildDate>
+    <pubDate>Fri, 30 Aug 2019 18:29:24 +0000</pubDate>
+    <lastBuildDate>Fri, 30 Aug 2019 18:29:24 +0000</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>Why Kubernetes?</title>
+        <description>&lt;p&gt;Kubernetes will help us drive down hosting costs, decrease maintenance time, and allow us to be cloud agnostic.
+&lt;!-- /excerpt --&gt;
+Sounds like a sales pitch, doesn’t it?  Well, it’s true.&lt;/p&gt;
+
+&lt;p&gt;Let’s start with some definitions.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubernetes.io/&quot;&gt;Kubernetes&lt;/a&gt; - Clustering software based on internal software at Google.  Developed by Google, with a plethora of &lt;a href=&quot;https://kubernetes.io/partners/&quot;&gt;partners&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;Cloud Agnostic - Running in such a way as to not be dependent on a single cloud provider.  Kubernetes has managed implementations from &lt;a href=&quot;https://www.digitalocean.com/products/kubernetes/&quot;&gt;Digital Ocean&lt;/a&gt;, &lt;a href=&quot;https://aws.amazon.com/eks/&quot;&gt;Amazon Web Services&lt;/a&gt;, and &lt;a href=&quot;https://docs.microsoft.com/en-us/azure/aks/&quot;&gt;Microsoft Azure&lt;/a&gt;, to name a few.&lt;/li&gt;
+  &lt;li&gt;Pod - A unit of work in Kubernetes.  This is usually a single Container, but sometimes may be multiple containers required for a task.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;why-now&quot;&gt;Why Now?&lt;/h2&gt;
+
+&lt;p&gt;Our hand was somewhat forced with Kubernetes.  Previously our systems had been using &lt;a href=&quot;https://github.com/coreos/fleet&quot;&gt;Fleet&lt;/a&gt; for our clustering tech, but it was deprecated several years ago.  With pending updates from AWS, and Fleet’s deprecation status, we were forced to make a move.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-kubernetes&quot;&gt;Why Kubernetes?&lt;/h2&gt;
+
+&lt;p&gt;First off, Kubernetes provides an experience similar to managed solutions such as Amazon Elastic Beanstalk, or Heroku.  Application are build in a container (we use Docker containers), while configuration is stored in YAML files, and uploaded to Kubernetes for deployment.  Through the configuration, you tell Kubernetes what state your application should be in (resources, replicas, load balancers, storage, etc), and Kubernetes takes steps to make that state happen.&lt;/p&gt;
+
+&lt;p&gt;In addition, deployments then can then easily be managed by CI/CD software such as Jenkins, Travis, or &lt;a href=&quot;https://about.gitlab.com/&quot;&gt;Gitlab&lt;/a&gt; (our choice) using Kubernetes’ baked in tools.  Once Gitlab and Kubernetes were wired together, deployments are as simple as pushing to &lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt; on Gitlab.&lt;/p&gt;
+
+&lt;p&gt;Kubernetes’ ingress controllers (I chose &lt;a href=&quot;https://www.nginx.com/&quot;&gt;NGINX&lt;/a&gt;) also allow for many services to be hosted off a single load balancer.  In addition, the ingress controller is also attached to a cert-manager instance, which automagically obtains SSL certificates from &lt;a href=&quot;https://letsencrypt.org/&quot;&gt;Let’s Encrypt&lt;/a&gt;.  No more managing certs, or worrying about expiration.&lt;/p&gt;
+
+&lt;h2 id=&quot;how-is-this-better&quot;&gt;How is this better?&lt;/h2&gt;
+
+&lt;p&gt;First and foremost, Kubernetes manages state, while Fleet only managed services.  This means that if a server is removed from the cluster, Kubernetes will automagically move pods from the removed server to a healthy server, keeping the application running.  If a server is added to the cluster, Kubernetes will begin using it.&lt;/p&gt;
+
+&lt;p&gt;In addition to managing the state of each application, Kubernetes also manages the state of the cluster itself.  To that end, services like &lt;a href=&quot;https://www.datadoghq.com/&quot;&gt;Datadog&lt;/a&gt; can be configured as cluster-level-state.  If you configure Datadog to manage logs for the cluster, then each server will automagically receive a copy of the pods required for Datadog.&lt;/p&gt;
+
+&lt;p&gt;Unlike similar offerings (Heroku, Elastic Beanstalk, Google App Engine), Kubernetes is cloud agnostic, so we could theoretically move our infrastructure from AWS to Azure, Digital Ocean, or even back to on-premises hosting, with the same settings we’re currently using in AWS.&lt;/p&gt;
+
+&lt;p&gt;Another important feature:  Density.  With Fleet, each of our servers were dedicated to a single application.  Fleet allowed for co-locating some containers (cache server on the same machine as the application server), but for the most part the servers were single use only.  This meant having ~45 individual machines across our infrastructure.  With Kubernetes, I have been able to move all of these services to ~7 virtual machines, comprised of two Kubernetes clusters (one for Staging, one for Production), and database servers (RDS instances managed by AWS).  I am expecting ~60% savings in our cloud spending.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Kubernetes is a wonderful solution for small teams managing their own DevOps, or larger teams where velocity and density are important.  With tools like &lt;a href=&quot;https://kubernetes.io/docs/tasks/tools/install-minikube/&quot;&gt;minikube&lt;/a&gt;, you can get Kubernetes running on your machine today, and go play.  I highly suggest it.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 30 Aug 2019 00:00:00 +0000</pubDate>
+        <link>http://dev-blog.mexicoinsuranceonline.com/2019/08/30/why-kubernetes.html</link>
+        <guid isPermaLink="true">http://dev-blog.mexicoinsuranceonline.com/2019/08/30/why-kubernetes.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Trailblazer, beyond MVC</title>

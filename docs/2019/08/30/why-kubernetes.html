@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Why Kubernetes? - MIO - Dev Blog</title>
+  <meta name="description" content="Kubernetes will help us drive down hosting costs, decrease maintenance time, and allow us to be cloud agnostic.">
+  <!-- Skelton's favorite font. -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-30426adc5bf9b5fd4fead82e295cfa323a157c5c9ae6380350ecfac299d6b879.css">
+  <link rel="canonical" href="http://dev-blog.mexicoinsuranceonline.com/2019/08/30/why-kubernetes.html">
+  <link rel="alternate" type="application/rss+xml" title="MIO - Dev Blog" href="http://dev-blog.mexicoinsuranceonline.com/feed.xml">
+
+</head>
+
+  <body>
+    <header class="container">
+  <a href="http://dev-blog.mexicoinsuranceonline.com" alt="Home">
+    <img src="/assets/mio-logo-85b8429778764ab0d95dbdc40ab9e8092e616b0576ea5b68be23c4d0c9c18ddb.png" alt="Mexico Insurance Online">
+  </a>
+</header>
+
+    <div class="container">
+      <h1>Why Kubernetes?</h1>
+<div class="post">
+  <p>Kubernetes will help us drive down hosting costs, decrease maintenance time, and allow us to be cloud agnostic.
+<!-- /excerpt -->
+Sounds like a sales pitch, doesn’t it?  Well, it’s true.</p>
+
+<p>Let’s start with some definitions.</p>
+
+<ul>
+  <li><a href="https://kubernetes.io/">Kubernetes</a> - Clustering software based on internal software at Google.  Developed by Google, with a plethora of <a href="https://kubernetes.io/partners/">partners</a>.</li>
+  <li>Cloud Agnostic - Running in such a way as to not be dependent on a single cloud provider.  Kubernetes has managed implementations from <a href="https://www.digitalocean.com/products/kubernetes/">Digital Ocean</a>, <a href="https://aws.amazon.com/eks/">Amazon Web Services</a>, and <a href="https://docs.microsoft.com/en-us/azure/aks/">Microsoft Azure</a>, to name a few.</li>
+  <li>Pod - A unit of work in Kubernetes.  This is usually a single Container, but sometimes may be multiple containers required for a task.</li>
+</ul>
+
+<h2 id="why-now">Why Now?</h2>
+
+<p>Our hand was somewhat forced with Kubernetes.  Previously our systems had been using <a href="https://github.com/coreos/fleet">Fleet</a> for our clustering tech, but it was deprecated several years ago.  With pending updates from AWS, and Fleet’s deprecation status, we were forced to make a move.</p>
+
+<h2 id="why-kubernetes">Why Kubernetes?</h2>
+
+<p>First off, Kubernetes provides an experience similar to managed solutions such as Amazon Elastic Beanstalk, or Heroku.  Application are build in a container (we use Docker containers), while configuration is stored in YAML files, and uploaded to Kubernetes for deployment.  Through the configuration, you tell Kubernetes what state your application should be in (resources, replicas, load balancers, storage, etc), and Kubernetes takes steps to make that state happen.</p>
+
+<p>In addition, deployments then can then easily be managed by CI/CD software such as Jenkins, Travis, or <a href="https://about.gitlab.com/">Gitlab</a> (our choice) using Kubernetes’ baked in tools.  Once Gitlab and Kubernetes were wired together, deployments are as simple as pushing to <code class="highlighter-rouge">master</code> on Gitlab.</p>
+
+<p>Kubernetes’ ingress controllers (I chose <a href="https://www.nginx.com/">NGINX</a>) also allow for many services to be hosted off a single load balancer.  In addition, the ingress controller is also attached to a cert-manager instance, which automagically obtains SSL certificates from <a href="https://letsencrypt.org/">Let’s Encrypt</a>.  No more managing certs, or worrying about expiration.</p>
+
+<h2 id="how-is-this-better">How is this better?</h2>
+
+<p>First and foremost, Kubernetes manages state, while Fleet only managed services.  This means that if a server is removed from the cluster, Kubernetes will automagically move pods from the removed server to a healthy server, keeping the application running.  If a server is added to the cluster, Kubernetes will begin using it.</p>
+
+<p>In addition to managing the state of each application, Kubernetes also manages the state of the cluster itself.  To that end, services like <a href="https://www.datadoghq.com/">Datadog</a> can be configured as cluster-level-state.  If you configure Datadog to manage logs for the cluster, then each server will automagically receive a copy of the pods required for Datadog.</p>
+
+<p>Unlike similar offerings (Heroku, Elastic Beanstalk, Google App Engine), Kubernetes is cloud agnostic, so we could theoretically move our infrastructure from AWS to Azure, Digital Ocean, or even back to on-premises hosting, with the same settings we’re currently using in AWS.</p>
+
+<p>Another important feature:  Density.  With Fleet, each of our servers were dedicated to a single application.  Fleet allowed for co-locating some containers (cache server on the same machine as the application server), but for the most part the servers were single use only.  This meant having ~45 individual machines across our infrastructure.  With Kubernetes, I have been able to move all of these services to ~7 virtual machines, comprised of two Kubernetes clusters (one for Staging, one for Production), and database servers (RDS instances managed by AWS).  I am expecting ~60% savings in our cloud spending.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Kubernetes is a wonderful solution for small teams managing their own DevOps, or larger teams where velocity and density are important.  With tools like <a href="https://kubernetes.io/docs/tasks/tools/install-minikube/">minikube</a>, you can get Kubernetes running on your machine today, and go play.  I highly suggest it.</p>
+
+</div>
+    </div>
+    <footer class="container">
+  <div>
+    © 1999 - 2019
+    International Insurance Group, Inc. DBA Mexico &amp; RV Insurance Services
+  </div>
+  <div>
+    Visit
+    <a href="https://www.mexicoinsuranceonline.com/" rel="noopener" target="_blank">Mexico Insurance Online</a>
+    to sign up and sell our products on your website.
+  </div>
+</footer>
+
+    <script type="text/javascript" src="/assets/main-c4e13efdd11ca4a8394acb661ea84d99b3c9e7f86080caf1c1e75dd1cc38fc05.js"></script>
+  </body>
+</html>

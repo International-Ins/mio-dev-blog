@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Logging Kubernetes to Datadog - MIO - Dev Blog</title>
+  <meta name="description" content="Logging 40 pods, with three different server technologies, in one cluster.Sound daunting?  Datadog made it surprisingly easy.">
+  <!-- Skelton's favorite font. -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-30426adc5bf9b5fd4fead82e295cfa323a157c5c9ae6380350ecfac299d6b879.css">
+  <link rel="canonical" href="http://dev-blog.mexicoinsuranceonline.com/2019/09/02/logging-k8s-to-datadog.html">
+  <link rel="alternate" type="application/rss+xml" title="MIO - Dev Blog" href="http://dev-blog.mexicoinsuranceonline.com/feed.xml">
+
+</head>
+
+  <body>
+    <header class="container">
+  <a href="http://dev-blog.mexicoinsuranceonline.com" alt="Home">
+    <img src="/assets/mio-logo-85b8429778764ab0d95dbdc40ab9e8092e616b0576ea5b68be23c4d0c9c18ddb.png" alt="Mexico Insurance Online">
+  </a>
+</header>
+
+    <div class="container">
+      <h1>Logging Kubernetes to Datadog</h1>
+<div class="post">
+  <p>Logging 40 pods, with three different server technologies, in one cluster.
+Sound daunting?  Datadog made it surprisingly easy.
+<!-- /excerpt -->
+Kubernetes has allowed me to increase the cloud usage density, lowering costs, and increasing productivity.  Logging all of those pods running on the same servers, could be taxing, but Datadog and Kubernetes made it easy.</p>
+
+<p>Datadog provides wonderful <a href="https://docs.datadoghq.com/integrations/kubernetes/">directions</a> to get you started.  Shortly after getting the logging working, I found an issue revolving around Kubernetes status checks.  Status checks produce a lot of logs if you’re not ready for it.  Datadog was ingesting over 3 million logs per day, before the systems hit production, at an estimated $177/mo.</p>
+
+<h2 id="solution">Solution</h2>
+
+<p>To limit the logs produced as a side effect of Kubernetes, I modified each systems to suppress logging from Kubernetes.  To determine the log entries from Kubernetes, I took two approaches:</p>
+
+<ol>
+  <li>Ignore requests from Kubernetes’ User-Agents (<code class="highlighter-rouge">kube-probe/1.13+</code> in my case).</li>
+  <li>Tell Kubernetes to check a different URL, and ignore requests to that URL.</li>
+</ol>
+
+<h3 id="apache">Apache</h3>
+
+<p>Apache was fairly easy to suppress logs:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>SetEnvIf User-Agent "^kube-probe" dontlog
+SetEnvIf Request_URI "\.(jpg|js|png|ico|css|woff)$" dontlog
+CustomLog /proc/self/fd/1 central env=!dontlog
+</code></pre>
+</div>
+
+<p>In this case, I turn of logging of those events where the User-Agent matches the regular expression.  I also added a few other lines to ignore directories and static file types, also lowering the number of log entries.</p>
+
+<h3 id="nginx">NGINX</h3>
+
+<p>NGINX was also easy.  First, Kubernetes needed to be configured to use <code class="highlighter-rouge">/status.txt</code> as it’s liveness endpoint.  If you’re hosting an application within NGINX (such as PHP), you may want to use a path which ensures the application is alive (<code class="highlighter-rouge">/status.php</code>, for example).</p>
+
+<p>Then, configure NGINX to ingore those requests:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>location /status.txt {
+  access_log off;
+}
+</code></pre>
+</div>
+
+<h3 id="ruby-on-rails">Ruby on Rails</h3>
+
+<p>Ruby on Rails is where things got more challenging.  By default, Rails’ logging is rather verbose.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>200 OK in 159ms (Views: 158.3ms | ActiveRecord: 0.0ms)
+Rendered root/index.html.haml within layouts/application (24.8ms)
+Parameters: {"locale"=&gt;"en-US"}
+Processing by QuotesController#new as HTML
+Started GET "/" for &lt;sic&gt; at 2019-08-23 15:59:56 +0000
+</code></pre>
+</div>
+
+<p>Step one is to shore this up.  I personally like <a href="https://github.com/roidrage/lograge">Lograge</a> for this application.  It gets your logs down to a parsable format.  But what about ignore Kubernetes requests?  That requires some additional setup.  In your <code class="highlighter-rouge">ApplicationController</code> class, you need to add the User-Agent to the payload using a method provided by Lograge:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>def append_info_to_payload(payload)
+  super
+  payload[:user_agent] = request.user_agent
+end
+</code></pre>
+</div>
+
+<p>Now, in <code class="highlighter-rouge">initializer/lograge.rb</code>, filter out requests based on the <code class="highlighter-rouge">User-Agent</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>IGNORE_AGENTS = Regexp.union([
+  /^kube-probe/i,
+])
+Rails.application.configure do
+  config.lograge.enabled = true
+  config.lograge.ignore_custom = lambda do |event|
+    event.payload[:user_agent].match(IGNORE_AGENTS).present?
+  end
+end
+</code></pre>
+</div>
+
+<p>I created a regular expression here, so that additional ignored user-agents can be easily specified later.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Datadog logging is a beautiful thing, and worth looking into.  Be sure to monitor your usage during the free trial, though.  I also faced challenges in other applications, but those are too specialized to be worth listing here.</p>
+
+
+</div>
+    </div>
+    <footer class="container">
+  <div>
+    © 1999 - 2019
+    International Insurance Group, Inc. DBA Mexico &amp; RV Insurance Services
+  </div>
+  <div>
+    Visit
+    <a href="https://www.mexicoinsuranceonline.com/" rel="noopener" target="_blank">Mexico Insurance Online</a>
+    to sign up and sell our products on your website.
+  </div>
+</footer>
+
+    <script type="text/javascript" src="/assets/main-c4e13efdd11ca4a8394acb661ea84d99b3c9e7f86080caf1c1e75dd1cc38fc05.js"></script>
+  </body>
+</html>

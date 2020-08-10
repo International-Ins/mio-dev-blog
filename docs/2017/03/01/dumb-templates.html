@@ -38,7 +38,7 @@
 
 <p><a href="https://github.com/zendesk/curly">Curly Templates</a> is what Mexico Insurance Online’s application will use for the view layer in our rebuild project.  The magic of Curly lies in its Presenter classes:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Posts</span><span class="o">::</span><span class="no">CommentPresenter</span> <span class="o">&lt;</span> <span class="no">Curly</span><span class="o">::</span><span class="no">Presenter</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Posts</span><span class="o">::</span><span class="no">CommentPresenter</span> <span class="o">&lt;</span> <span class="no">Curly</span><span class="o">::</span><span class="no">Presenter</span>
   <span class="n">presents</span> <span class="ss">:comment</span>
   <span class="k">def</span> <span class="nf">replies</span>
     <span class="n">content_tag</span> <span class="ss">:div</span> <span class="k">do</span>
@@ -48,8 +48,7 @@
     <span class="k">end</span>
   <span class="k">end</span>
 <span class="k">end</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>A single presenter, such as the above, can be shared across multiple views.  If a resellers needs to customize the way that replies are presented, then an alternative to the <code class="highlighter-rouge">_reply.html.curly</code> file can be created, leaving the rest of the view un-touched.</p>
 
@@ -61,7 +60,7 @@
     </div>
     <footer class="container">
   <div>
-    © 1999 - 2019
+    © 1999 - 2020
     International Insurance Group, Inc. DBA Mexico &amp; RV Insurance Services
   </div>
   <div>

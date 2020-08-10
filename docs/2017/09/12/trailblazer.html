@@ -36,7 +36,7 @@
 
 <p>In business applications, however, we have more complex logic that may not fit into the MVC “buckets”.  As an example, consider the following, to charge a credit card (completely made up):</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">charge_card</span><span class="p">(</span><span class="n">cc_info</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">charge_card</span><span class="p">(</span><span class="n">cc_info</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span>
   <span class="n">transaction</span> <span class="o">=</span> <span class="no">Braintree</span><span class="p">.</span><span class="nf">new_transaction</span><span class="p">(</span><span class="ss">cc_num: </span><span class="n">cc_info</span><span class="p">.</span><span class="nf">account_number</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">transaction</span><span class="p">.</span><span class="nf">authorize</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
     <span class="n">transaction</span><span class="p">.</span><span class="nf">charge</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
@@ -44,12 +44,11 @@
     <span class="k">raise</span> <span class="s2">"Unable to charge credit card."</span>
   <span class="k">end</span>
 <span class="k">end</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>The credit card info will never be saved to the database, used directly inside a view, and is not a part of a web request, so doesn’t belong in MVC.  This is where Trailblazer steps in and offers a new abstraction called an Operation.  Each operation encompasses a specific workflow.  As an example, the above code could be written as an operation:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Payment</span><span class="o">::</span><span class="no">Charge</span><span class="o">::</span><span class="no">CreditCard</span> <span class="o">&lt;</span> <span class="no">Trailblazer</span><span class="o">::</span><span class="no">Operation</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Payment</span><span class="o">::</span><span class="no">Charge</span><span class="o">::</span><span class="no">CreditCard</span> <span class="o">&lt;</span> <span class="no">Trailblazer</span><span class="o">::</span><span class="no">Operation</span>
   <span class="n">step</span> <span class="ss">:model!</span>
   <span class="n">step</span> <span class="ss">:authorize!</span>
   <span class="n">failure</span> <span class="ss">:error!</span>
@@ -76,8 +75,7 @@
     <span class="k">raise</span> <span class="s2">"Unable to charge credit card."</span>
   <span class="k">end</span>
 <span class="k">end</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Even writing this out now, I find myself thinking, “That’s a lot more code to do the same thing”, but let’s break the operation down.  The calls to <code class="highlighter-rouge">step</code> and <code class="highlighter-rouge">failure</code> outline the process.  Simple and readable definition of the steps required to charge a credit card.  Each step is a method, and by appending <code class="highlighter-rouge">!</code>, we tell Trailblazer that the return value of the method is important.  A ‘falsey’ return will cause the Operation to trigger the next <code class="highlighter-rouge">failure</code> step, stopping the operation.  Also notice that steps are reusable, in the case of <code class="highlighter-rouge">error!</code></p>
 
@@ -91,7 +89,7 @@
     </div>
     <footer class="container">
   <div>
-    © 1999 - 2019
+    © 1999 - 2020
     International Insurance Group, Inc. DBA Mexico &amp; RV Insurance Services
   </div>
   <div>

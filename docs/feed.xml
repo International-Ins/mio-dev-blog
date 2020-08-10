@@ -6,9 +6,9 @@
 </description>
     <link>http://dev-blog.mexicoinsuranceonline.com/</link>
     <atom:link href="http://dev-blog.mexicoinsuranceonline.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 03 Sep 2019 18:37:46 +0000</pubDate>
-    <lastBuildDate>Tue, 03 Sep 2019 18:37:46 +0000</lastBuildDate>
-    <generator>Jekyll v3.5.2</generator>
+    <pubDate>Mon, 10 Aug 2020 12:58:18 +0000</pubDate>
+    <lastBuildDate>Mon, 10 Aug 2020 12:58:18 +0000</lastBuildDate>
+    <generator>Jekyll v3.6.3</generator>
     
       <item>
         <title>Logging Kubernetes to Datadog</title>
@@ -32,11 +32,10 @@ Kubernetes has allowed me to increase the cloud usage density, lowering costs, a
 
 &lt;p&gt;Apache was fairly easy to suppress logs:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;SetEnvIf User-Agent &quot;^kube-probe&quot; dontlog
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;SetEnvIf User-Agent &quot;^kube-probe&quot; dontlog
 SetEnvIf Request_URI &quot;\.(jpg|js|png|ico|css|woff)$&quot; dontlog
 CustomLog /proc/self/fd/1 central env=!dontlog
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;In this case, I turn of logging of those events where the User-Agent matches the regular expression.  I also added a few other lines to ignore directories and static file types, also lowering the number of log entries.&lt;/p&gt;
 
@@ -46,36 +45,33 @@ CustomLog /proc/self/fd/1 central env=!dontlog
 
 &lt;p&gt;Then, configure NGINX to ingore those requests:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;location /status.txt {
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;location /status.txt {
   access_log off;
 }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h3 id=&quot;ruby-on-rails&quot;&gt;Ruby on Rails&lt;/h3&gt;
 
 &lt;p&gt;Ruby on Rails is where things got more challenging.  By default, Rails’ logging is rather verbose.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;200 OK in 159ms (Views: 158.3ms | ActiveRecord: 0.0ms)
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;200 OK in 159ms (Views: 158.3ms | ActiveRecord: 0.0ms)
 Rendered root/index.html.haml within layouts/application (24.8ms)
 Parameters: {&quot;locale&quot;=&amp;gt;&quot;en-US&quot;}
 Processing by QuotesController#new as HTML
 Started GET &quot;/&quot; for &amp;lt;sic&amp;gt; at 2019-08-23 15:59:56 +0000
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Step one is to shore this up.  I personally like &lt;a href=&quot;https://github.com/roidrage/lograge&quot;&gt;Lograge&lt;/a&gt; for this application.  It gets your logs down to a parsable format.  But what about ignore Kubernetes requests?  That requires some additional setup.  In your &lt;code class=&quot;highlighter-rouge&quot;&gt;ApplicationController&lt;/code&gt; class, you need to add the User-Agent to the payload using a method provided by Lograge:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def append_info_to_payload(payload)
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def append_info_to_payload(payload)
   super
   payload[:user_agent] = request.user_agent
 end
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Now, in &lt;code class=&quot;highlighter-rouge&quot;&gt;initializer/lograge.rb&lt;/code&gt;, filter out requests based on the &lt;code class=&quot;highlighter-rouge&quot;&gt;User-Agent&lt;/code&gt;:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;IGNORE_AGENTS = Regexp.union([
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;IGNORE_AGENTS = Regexp.union([
   /^kube-probe/i,
 ])
 Rails.application.configure do
@@ -84,8 +80,7 @@ Rails.application.configure do
     event.payload[:user_agent].match(IGNORE_AGENTS).present?
   end
 end
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;I created a regular expression here, so that additional ignored user-agents can be easily specified later.&lt;/p&gt;
 
@@ -160,7 +155,7 @@ Sounds like a sales pitch, doesn’t it?  Well, it’s true.&lt;/p&gt;
 
 &lt;p&gt;In business applications, however, we have more complex logic that may not fit into the MVC “buckets”.  As an example, consider the following, to charge a credit card (completely made up):&lt;/p&gt;
 
-&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;charge_card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cc_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;charge_card&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cc_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
   &lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Braintree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new_transaction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;cc_num: &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cc_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;account_number&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;authorize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;transaction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;charge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
@@ -168,12 +163,11 @@ Sounds like a sales pitch, doesn’t it?  Well, it’s true.&lt;/p&gt;
     &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Unable to charge credit card.&quot;&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;The credit card info will never be saved to the database, used directly inside a view, and is not a part of a web request, so doesn’t belong in MVC.  This is where Trailblazer steps in and offers a new abstraction called an Operation.  Each operation encompasses a specific workflow.  As an example, the above code could be written as an operation:&lt;/p&gt;
 
-&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Payment&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Charge&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CreditCard&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Trailblazer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Operation&lt;/span&gt;
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Payment&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Charge&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CreditCard&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Trailblazer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Operation&lt;/span&gt;
   &lt;span class=&quot;n&quot;&gt;step&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:model!&lt;/span&gt;
   &lt;span class=&quot;n&quot;&gt;step&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:authorize!&lt;/span&gt;
   &lt;span class=&quot;n&quot;&gt;failure&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:error!&lt;/span&gt;
@@ -200,8 +194,7 @@ Sounds like a sales pitch, doesn’t it?  Well, it’s true.&lt;/p&gt;
     &lt;span class=&quot;k&quot;&gt;raise&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Unable to charge credit card.&quot;&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Even writing this out now, I find myself thinking, “That’s a lot more code to do the same thing”, but let’s break the operation down.  The calls to &lt;code class=&quot;highlighter-rouge&quot;&gt;step&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;failure&lt;/code&gt; outline the process.  Simple and readable definition of the steps required to charge a credit card.  Each step is a method, and by appending &lt;code class=&quot;highlighter-rouge&quot;&gt;!&lt;/code&gt;, we tell Trailblazer that the return value of the method is important.  A ‘falsey’ return will cause the Operation to trigger the next &lt;code class=&quot;highlighter-rouge&quot;&gt;failure&lt;/code&gt; step, stopping the operation.  Also notice that steps are reusable, in the case of &lt;code class=&quot;highlighter-rouge&quot;&gt;error!&lt;/code&gt;&lt;/p&gt;
 
@@ -232,7 +225,7 @@ Sounds like a sales pitch, doesn’t it?  Well, it’s true.&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://github.com/zendesk/curly&quot;&gt;Curly Templates&lt;/a&gt; is what Mexico Insurance Online’s application will use for the view layer in our rebuild project.  The magic of Curly lies in its Presenter classes:&lt;/p&gt;
 
-&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Posts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CommentPresenter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Curly&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Presenter&lt;/span&gt;
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Posts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;CommentPresenter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;Curly&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;Presenter&lt;/span&gt;
   &lt;span class=&quot;n&quot;&gt;presents&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:comment&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;replies&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;content_tag&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;:div&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
@@ -242,8 +235,7 @@ Sounds like a sales pitch, doesn’t it?  Well, it’s true.&lt;/p&gt;
     &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;A single presenter, such as the above, can be shared across multiple views.  If a resellers needs to customize the way that replies are presented, then an alternative to the &lt;code class=&quot;highlighter-rouge&quot;&gt;_reply.html.curly&lt;/code&gt; file can be created, leaving the rest of the view un-touched.&lt;/p&gt;
 
